@@ -100,9 +100,9 @@ function UploadView({ onReport, onError }) {
           {loading ? "Analysing…" : "Analyse"}
         </button>
       </form>
-      <button type="button" className="link" onClick={handleDemo} disabled={loading}>
+      {/* <button type="button" className="link" onClick={handleDemo} disabled={loading}>
         Try with sample data →
-      </button>
+      </button> */}
     </div>
   );
 }
