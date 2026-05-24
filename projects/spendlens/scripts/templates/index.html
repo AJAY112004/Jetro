@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>SpendLens</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 40px; max-width: 480px; width: 100%; text-align: center; }
+    h1 { font-size: 1.75rem; color: #fff; margin-bottom: 8px; }
+    .sub { color: #94a3b8; margin-bottom: 28px; font-size: 0.95rem; }
+    .note { font-size: 0.8rem; color: #64748b; margin-bottom: 24px; }
+    input[type=file] { width: 100%; padding: 12px; background: #0f172a; border: 1px dashed #475569; border-radius: 8px; color: #cbd5e1; margin-bottom: 16px; }
+    button { width: 100%; padding: 14px; background: #3b82f6; color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+    button:disabled { opacity: 0.6; cursor: wait; }
+    button:hover:not(:disabled) { background: #2563eb; }
+    .demo { display: inline-block; margin-top: 20px; color: #3b82f6; cursor: pointer; font-size: 0.9rem; background: none; border: none; width: auto; padding: 0; }
+    .flash { background: #7f1d1d; color: #fecaca; padding: 10px; border-radius: 8px; margin-bottom: 16px; font-size: 0.85rem; display: none; }
+    .flash.show { display: block; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>SpendLens</h1>
+    <p class="sub">Your money, clearly.</p>
+    <p class="note">Your data is processed locally. Never stored.</p>
+    <div id="flash" class="flash" role="alert"></div>
+    <!-- API upload: no navigation to /analyse (fixes iframe / embed errors) -->
+    <form id="upload-form">
+      <label style="display:block;text-align:left;margin-bottom:8px;font-size:0.85rem;color:#94a3b8">Upload your bank statement (PDF or CSV)</label>
+      <input type="file" id="statement" name="statement" accept=".pdf,.csv" required/>
+      <button type="submit" id="submit-btn">Analyse</button>
+    </form>
+    <button type="button" class="demo" id="demo-btn">Try with sample data →</button>
+  </div>
+  <script>
+    (function () {
+      var API = "{{ api_base | default('/api') }}";
+
+      function showError(msg) {
+        var el = document.getElementById('flash');
+        el.textContent = msg;
+        el.classList.add('show');
+      }
+
+      function hideError() {
+        document.getElementById('flash').classList.remove('show');
+      }
+
+      async function postFile(file) {
+        var fd = new FormData();
+        fd.append('statement', file);
+        var res = await fetch(API + '/analyse', {
+          method: 'POST',
+          body: fd,
+          credentials: 'include',
+          headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        var data = await res.json().catch(function () { return {}; });
+        if (!res.ok || !data.ok) {
+          throw new Error(data.error || ('Request failed (' + res.status + ')'));
+        }
+        return data.report;
+      }
+
+      async function loadDemo() {
+        var res = await fetch(API + '/demo', {
+          credentials: 'include',
+          headers: { 'Accept': 'application/json' }
+        });
+        var data = await res.json().catch(function () { return {}; });
+        if (!res.ok || !data.ok) {
+          throw new Error(data.error || ('Demo failed (' + res.status + ')'));
+        }
+        return data.report;
+      }
+
+      function showResults(report) {
+        sessionStorage.setItem('spendlens_report', JSON.stringify(report));
+        window.location.href = '/results';
+      }
+
+      document.getElementById('upload-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        hideError();
+        var input = document.getElementById('statement');
+        var btn = document.getElementById('submit-btn');
+        if (!input.files || !input.files[0]) {
+          showError('Please choose a file.');
+          return;
+        }
+        btn.disabled = true;
+        btn.textContent = 'Analysing…';
+        try {
+          var report = await postFile(input.files[0]);
+          showResults(report);
+        } catch (err) {
+          showError(err.message || 'Upload failed. Is the backend running on port 5050?');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Analyse';
+        }
+      });
+
+      document.getElementById('demo-btn').addEventListener('click', async function () {
+        hideError();
+        try {
+          var report = await loadDemo();
+          showResults(report);
+        } catch (err) {
+          showError(err.message || 'Demo failed. Start the backend: python app.py');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

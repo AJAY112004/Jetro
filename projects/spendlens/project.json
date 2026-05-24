@@ -1,0 +1,9 @@
+{
+  "name": "SpendLens",
+  "slug": "spendlens",
+  "description": "Personal expense analysis from Indian bank statements — parse, categorise, and visualise spending.",
+  "createdAt": "2026-05-24T00:00:00.000Z",
+  "linkedConnectors": [],
+  "linkedTemplates": [],
+  "linkedRecipes": []
+}

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>SpendLens — Results</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #0f172a; color: #e2e8f0; padding: 16px; max-width: 1100px; margin: 0 auto; }
+    a { color: #3b82f6; }
+    .header { margin-bottom: 20px; }
+    .header h1 { color: #fff; font-size: 1.5rem; }
+    .header p { color: #94a3b8; font-size: 0.9rem; }
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+    @media (max-width: 700px) { .kpis { grid-template-columns: 1fr 1fr; } }
+    .kpi { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 16px; }
+    .kpi .lbl { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; }
+    .kpi .val { font-size: 1.35rem; font-weight: 700; margin-top: 4px; }
+    .inc .val { color: #22c55e; }
+    .exp .val { color: #ef4444; }
+    .sav .val { color: #3b82f6; }
+    .badge { display: inline-block; margin-top: 6px; padding: 3px 10px; border-radius: 999px; font-size: 0.7rem; font-weight: 600; }
+    .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    @media (max-width: 700px) { .charts { grid-template-columns: 1fr; } }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+    .card h2 { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 12px; }
+    .alert { padding: 10px 0; border-bottom: 1px solid #334155; font-size: 0.85rem; display: flex; gap: 8px; }
+    .insight { padding: 8px 0; font-size: 0.9rem; display: flex; gap: 8px; }
+    .rebal { border-left: 4px solid #3b82f6; padding: 14px; background: #1e3a5f33; border-radius: 8px; margin-bottom: 16px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+    .btn { padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+    .btn-primary { background: #3b82f6; color: #fff; }
+    .btn-outline { border: 1px solid #475569; color: #cbd5e1; }
+    canvas { max-height: 260px; }
+  </style>
+</head>
+<body>
+  <div id="root">Loading…</div>
+  <script>
+    (function () {
+      var report = {% if report %}{{ report | tojson }}{% else %}null{% endif %};
+      if (!report) {
+        try { report = JSON.parse(sessionStorage.getItem('spendlens_report') || 'null'); } catch (e) {}
+      }
+      if (!report) {
+        document.getElementById('root').innerHTML = '<p>No report found. <a href="/">Upload a statement</a></p>';
+        return;
+      }
+
+      var s = report.spend_summary || {};
+      var sc = report.savings_score || {};
+      function fmt(n) { return '₹' + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 0 }); }
+
+      var html = '';
+      html += '<div class="header"><h1>SpendLens — Analysis</h1><p>' + (report.month_label || '') + '</p></div>';
+      html += '<div class="kpis">';
+      html += '<div class="kpi inc"><div class="lbl">Total Income</div><div class="val">' + fmt(s.total_income) + '</div></div>';
+      html += '<div class="kpi exp"><div class="lbl">Total Expenses</div><div class="val">' + fmt(s.total_expenses) + '</div></div>';
+      html += '<div class="kpi sav"><div class="lbl">Net Savings</div><div class="val">' + fmt(s.net_savings) + '</div></div>';
+      html += '<div class="kpi"><div class="lbl">Savings Score</div><div class="val">' + (sc.score||0) + '/100</div>';
+      html += '<span class="badge" style="background:' + (sc.colour||'#64748b') + '33;color:' + (sc.colour||'#fff') + '">' + (sc.label||'') + '</span></div></div>';
+      html += '<div class="charts"><div class="card"><h2>Category breakdown</h2><canvas id="donut"></canvas></div>';
+      html += '<div class="card"><h2>Daily spend trend</h2><canvas id="line"></canvas></div></div>';
+      html += '<div class="card"><h2>⚠ Anomaly alerts</h2>';
+      (report.anomalies || []).forEach(function(a) { html += '<div class="alert"><span>⚠</span><span>' + a.message + '</span></div>'; });
+      if (!(report.anomalies || []).length) html += '<p style="color:#94a3b8">No anomalies flagged.</p>';
+      html += '</div><div class="card"><h2>💡 AI insights</h2>';
+      (report.ai_insights || []).forEach(function(t) { html += '<div class="insight"><span>💡</span><span>' + t + '</span></div>'; });
+      html += '</div><div class="rebal"><strong>Rebalancing:</strong> ' + (report.rebalancing_recommendation||'') + '</div>';
+      html += '<div class="actions"><a class="btn btn-primary" href="/api/download-pdf">Download Report (PDF)</a><a class="btn btn-outline" href="/">← Upload another</a></div>';
+
+      document.getElementById('root').innerHTML = html;
+
+      var cats = report.category_breakdown || [];
+      var trend = report.daily_spend_trend || [];
+      var colours = ['#3b82f6','#22c55e','#ef4444','#eab308','#a855f7','#f97316','#06b6d4','#ec4899','#84cc16','#64748b'];
+      new Chart(document.getElementById('donut'), {
+        type: 'doughnut',
+        data: { labels: cats.map(function(c){ return c.category; }), datasets: [{ data: cats.map(function(c){ return c.amount; }), backgroundColor: colours }] },
+        options: { plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', boxWidth: 12 } } } }
+      });
+      new Chart(document.getElementById('line'), {
+        type: 'line',
+        data: {
+          labels: trend.map(function(d){ return (d.date || '').slice(5); }),
+          datasets: [{ label: 'Daily spend', data: trend.map(function(d){ return d.spend; }), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.2)', fill: true, tension: 0.3 }]
+        },
+        options: { scales: { x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }, y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } } }, plugins: { legend: { display: false } } }
+      });
+    })();
+  </script>
+</body>
+</html>

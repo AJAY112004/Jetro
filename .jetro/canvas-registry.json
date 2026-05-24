@@ -1,0 +1,20 @@
+[
+  {
+    "id": "research_board_mpk10cj9",
+    "name": "Research Board",
+    "projectSlug": null,
+    "createdAt": "2026-05-24T17:03:07.893Z"
+  },
+  {
+    "id": "spendlens_may24",
+    "name": "SpendLens",
+    "projectSlug": "spendlens",
+    "createdAt": "2026-05-24T22:45:00.000Z"
+  },
+  {
+    "id": "spendlens-dashboard",
+    "name": "spendlens-dashboard",
+    "projectSlug": "spendlens",
+    "createdAt": "2026-05-24T23:30:00.000Z"
+  }
+]

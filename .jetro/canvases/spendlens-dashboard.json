@@ -1,0 +1,44 @@
+{
+  "name": "spendlens-dashboard",
+  "elements": [
+    {
+      "id": "sl_header",
+      "type": "note",
+      "position": { "x": 80, "y": 40 },
+      "size": { "width": 1100, "height": 90 },
+      "data": {
+        "title": "Header",
+        "content": "# SpendLens — Your Money, Clearly\n\n*AI-powered bank statement analyser · April 2026 sample*"
+      }
+    },
+    {
+      "id": "sl_dashboard_main",
+      "type": "frame",
+      "position": { "x": 80, "y": 150 },
+      "size": { "width": 1160, "height": 2200 },
+      "data": {
+        "title": "SpendLens Dashboard",
+        "file": ".jetro/frames/spendlens_dashboard.html",
+        "month_label": "April 2026",
+        "spend_summary": {
+          "total_income": 86049,
+          "total_expenses": 169028,
+          "net_savings": -82979,
+          "savings_rate_pct": -96.4
+        },
+        "savings_score": { "score": 15, "label": "Critical", "colour": "#ef4444" },
+        "category_breakdown": [],
+        "daily_spend_trend": [],
+        "anomalies": [],
+        "ai_insights": [],
+        "rebalancing_recommendation": ""
+      },
+      "refreshBinding": {
+        "scriptPath": ".jetro/scripts/spendlens_dashboard_refresh.py",
+        "intervalMs": 300000
+      }
+    }
+  ],
+  "edges": [],
+  "viewport": { "x": 0, "y": 0, "zoom": 0.85 }
+}

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>SpendLens Dashboard</title>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: #e2e8f0; padding: 20px; line-height: 1.5; }
+  .row { margin-bottom: 20px; }
+  .header h1 { font-size: 1.75rem; font-weight: 700; color: #fff; }
+  .header p { color: #94a3b8; margin-top: 4px; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  @media (max-width: 900px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+  .kpi { background: #1e293b; border-radius: 12px; padding: 18px; border: 1px solid #334155; }
+  .kpi-label { font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+  .kpi-value { font-size: 1.5rem; font-weight: 700; margin-top: 6px; }
+  .kpi.income .kpi-value { color: #22c55e; }
+  .kpi.expense .kpi-value { color: #ef4444; }
+  .kpi.savings .kpi-value { color: #3b82f6; }
+  .score-badge { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; margin-top: 8px; }
+  .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 900px) { .charts { grid-template-columns: 1fr; } }
+  .card { background: #1e293b; border-radius: 12px; padding: 16px; border: 1px solid #334155; }
+  .card h3 { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 10px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #334155; }
+  th { color: #94a3b8; font-weight: 600; }
+  .alert-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid #334155; font-size: 0.85rem; }
+  .alert-icon { color: #f59e0b; font-size: 1.1rem; }
+  .insight { display: flex; gap: 10px; padding: 8px 0; font-size: 0.9rem; }
+  .bulb { color: #eab308; }
+  .rebalance { background: linear-gradient(135deg, #1e3a5f, #1e293b); border-left: 4px solid #3b82f6; padding: 16px; border-radius: 8px; font-size: 0.95rem; }
+  .month-tag { color: #64748b; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>window.__INITIAL_REPORT__ = {"month_label": "April 2026", "spend_summary": {"total_income": 86049.0, "total_expenses": 169028.0, "net_savings": -82979.0, "savings_rate_pct": -96.4}, "category_breakdown": [{"category": "EMI & Loans", "amount": 59500.0, "pct": 35.2, "vs_last_month_pct": null}, {"category": "Transfers", "amount": 30000.0, "pct": 17.7, "vs_last_month_pct": null}, {"category": "Other", "amount": 23000.0, "pct": 13.6, "vs_last_month_pct": null}, {"category": "Transport", "amount": 14087.0, "pct": 8.3, "vs_last_month_pct": null}, {"category": "Shopping", "amount": 12794.0, "pct": 7.6, "vs_last_month_pct": null}, {"category": "Groceries", "amount": 8354.0, "pct": 4.9, "vs_last_month_pct": null}, {"category": "Utilities", "amount": 6647.0, "pct": 3.9, "vs_last_month_pct": null}, {"category": "Food & Dining", "amount": 6519.0, "pct": 3.9, "vs_last_month_pct": null}, {"category": "Health", "amount": 4760.0, "pct": 2.8, "vs_last_month_pct": null}, {"category": "Entertainment", "amount": 3367.0, "pct": 2.0, "vs_last_month_pct": null}], "top_merchants": [{"merchant": "ACH DR", "amount": 59500.0}, {"merchant": "ATM WDL", "amount": 23000.0}, {"merchant": "NEFT DR", "amount": 22000.0}, {"merchant": "MAKEMYTRIP", "amount": 8450.0}, {"merchant": "AMAZON PAY", "amount": 5898.0}], "savings_score": {"score": 15, "label": "Critical", "colour": "#ef4444", "savings_rate_pct": -96.4}, "anomalies": [{"type": "unusual_amount", "date": "2026-04-14", "description": "NEFT DR-RENT LANDLORD MR SINGH APR26", "amount": 22000.0, "category": "Transfers", "message": "\u20b922,000 is >2\u00d7 Transfers average (\u20b910,000)"}, {"type": "unusual_amount", "date": "2026-04-26", "description": "UPI-MAKEMYTRIP-mmt@hdfcbank-UPI/260426002", "amount": 8450.0, "category": "Transport", "message": "\u20b98,450 is >2\u00d7 Transport average (\u20b92,012)"}], "daily_spend_trend": [{"date": "2026-04-01", "spend": 28500.0}, {"date": "2026-04-02", "spend": 1130.0}, {"date": "2026-04-03", "spend": 6939.0}, {"date": "2026-04-04", "spend": 10000.0}, {"date": "2026-04-05", "spend": 1317.0}, {"date": "2026-04-06", "spend": 697.0}, {"date": "2026-04-07", "spend": 3721.0}, {"date": "2026-04-08", "spend": 13390.0}, {"date": "2026-04-09", "spend": 3400.0}, {"date": "2026-04-10", "spend": 4018.0}, {"date": "2026-04-11", "spend": 1238.0}, {"date": "2026-04-12", "spend": 6100.0}, {"date": "2026-04-13", "spend": 2820.0}, {"date": "2026-04-14", "spend": 24499.0}, {"date": "2026-04-15", "spend": 999.0}, {"date": "2026-04-16", "spend": 1299.0}, {"date": "2026-04-17", "spend": 5540.0}, {"date": "2026-04-18", "spend": 500.0}, {"date": "2026-04-19", "spend": 1450.0}, {"date": "2026-04-20", "spend": 18899.0}, {"date": "2026-04-22", "spend": 4200.0}, {"date": "2026-04-23", "spend": 2298.0}, {"date": "2026-04-24", "spend": 95.0}, {"date": "2026-04-25", "spend": 299.0}, {"date": "2026-04-26", "spend": 11450.0}, {"date": "2026-04-28", "spend": 1230.0}, {"date": "2026-04-29", "spend": 3880.0}, {"date": "2026-04-30", "spend": 9120.0}], "subscription_summary": {"count": 6, "monthly_total": 4284.0}, "ai_insights": ["Your biggest spend category is EMI & Loans at \u20b959,500 (35%)", "You have 6 active subscriptions totalling \u20b94,284/month", "Your savings rate is -96% \u2014 increase by \u20b9104,491/month to reach 25%"], "rebalancing_recommendation": "If you reduce EMI & Loans by 20%, you save an extra \u20b911,900/month"};</script>
+<script>
+(function() {
+  var PALETTE = ['#3b82f6','#22c55e','#ef4444','#eab308','#a855f7','#f97316','#06b6d4','#ec4899','#84cc16','#64748b'];
+
+  function fmt(n) {
+    return '₹' + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+  }
+
+  function render(data) {
+    var s = data.spend_summary || {};
+    var sc = data.savings_score || {};
+    var cats = data.category_breakdown || [];
+    var trend = data.daily_spend_trend || [];
+    var anomalies = data.anomalies || [];
+    var insights = data.ai_insights || [];
+    var reb = data.rebalancing_recommendation || '';
+
+    var html = '';
+    html += '<div class="row header"><h1>SpendLens — Your Money, Clearly</h1>';
+    html += '<p>AI-powered bank statement analyser</p>';
+    html += '<p class="month-tag">' + (data.month_label || '') + '</p></div>';
+
+    html += '<div class="row kpi-grid">';
+    html += '<div class="kpi income"><div class="kpi-label">Total Income</div><div class="kpi-value">' + fmt(s.total_income) + '</div></div>';
+    html += '<div class="kpi expense"><div class="kpi-label">Total Expenses</div><div class="kpi-value">' + fmt(s.total_expenses) + '</div></div>';
+    html += '<div class="kpi savings"><div class="kpi-label">Net Savings</div><div class="kpi-value">' + fmt(s.net_savings) + '</div></div>';
+    html += '<div class="kpi"><div class="kpi-label">Savings Score</div><div class="kpi-value">' + (sc.score || 0) + '/100</div>';
+    html += '<span class="score-badge" style="background:' + (sc.colour||'#64748b') + '33;color:' + (sc.colour||'#fff') + '">' + (sc.label||'') + '</span></div>';
+    html += '</div>';
+
+    html += '<div class="row charts">';
+    html += '<div class="card"><h3>Category breakdown</h3><div id="pieChart" style="height:280px"></div></div>';
+    html += '<div class="card"><h3>Daily spend trend</h3><div id="lineChart" style="height:280px"></div></div>';
+    html += '</div>';
+
+    html += '<div class="row card"><h3>Category breakdown</h3><table><thead><tr><th>Category</th><th>Amount</th><th>% of Total</th><th>vs Last Month</th></tr></thead><tbody>';
+    cats.forEach(function(c) {
+      html += '<tr><td>' + c.category + '</td><td>' + fmt(c.amount) + '</td><td>' + c.pct + '%</td><td>—</td></tr>';
+    });
+    html += '</tbody></table></div>';
+
+    html += '<div class="row card"><h3>⚠ Anomaly alerts</h3>';
+    if (!anomalies.length) html += '<p style="color:#94a3b8">No anomalies flagged.</p>';
+    anomalies.forEach(function(a) {
+      html += '<div class="alert-item"><span class="alert-icon">⚠</span><div><strong>' + (a.category||'') + '</strong> — ' + a.message + '</div></div>';
+    });
+    html += '</div>';
+
+    html += '<div class="row card"><h3>💡 AI insights</h3>';
+    insights.forEach(function(t) {
+      html += '<div class="insight"><span class="bulb">💡</span><span>' + t + '</span></div>';
+    });
+    html += '</div>';
+
+    html += '<div class="row rebalance"><strong>Rebalancing tip:</strong> ' + reb + '</div>';
+
+    document.getElementById('app').innerHTML = html;
+
+    if (typeof Plotly !== 'undefined' && cats.length) {
+      Plotly.newPlot('pieChart', [{
+        labels: cats.map(function(c){ return c.category; }),
+        values: cats.map(function(c){ return c.amount; }),
+        type: 'pie', hole: 0.45,
+        marker: { colors: PALETTE },
+        textinfo: 'label+percent', textposition: 'outside'
+      }], {
+        paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+        font: { color: '#cbd5e1', size: 11 },
+        margin: { t: 10, b: 10, l: 10, r: 10 },
+        showlegend: false
+      }, { responsive: true, displayModeBar: false });
+
+      var dates = trend.map(function(d){ return d.date; });
+      var spends = trend.map(function(d){ return d.spend; });
+      Plotly.newPlot('lineChart', [{
+        x: dates, y: spends, type: 'scatter', mode: 'lines+markers',
+        line: { color: '#3b82f6', width: 2 },
+        marker: { color: '#22c55e', size: 6 },
+        fill: 'tozeroy', fillcolor: 'rgba(59,130,246,0.15)'
+      }], {
+        paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+        font: { color: '#94a3b8', size: 11 },
+        xaxis: { gridcolor: '#334155' },
+        yaxis: { gridcolor: '#334155', tickprefix: '₹' },
+        margin: { t: 10, b: 40, l: 50, r: 10 }
+      }, { responsive: true, displayModeBar: false });
+    }
+  }
+
+  window.addEventListener('jet:refresh', function(e) {
+    if (e.detail) render(e.detail);
+  });
+
+  var initial = window.__INITIAL_REPORT__;
+  if (initial) render(initial);
+})();
+</script>
+</body>
+</html>
