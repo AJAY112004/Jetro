@@ -1,0 +1,241 @@
+{
+  "month_label": "May 2026",
+  "spend_summary": {
+    "total_income": 93000.0,
+    "total_expenses": 151535.0,
+    "net_savings": -58535.0,
+    "savings_rate_pct": -62.9
+  },
+  "category_breakdown": [
+    {
+      "category": "EMI & Loans",
+      "amount": 68748.0,
+      "pct": 45.4,
+      "vs_last_month_pct": null
+    },
+    {
+      "category": "Other",
+      "amount": 39348.0,
+      "pct": 26.0,
+      "vs_last_month_pct": null
+    },
+    {
+      "category": "Transfers",
+      "amount": 27500.0,
+      "pct": 18.1,
+      "vs_last_month_pct": null
+    },
+    {
+      "category": "Utilities",
+      "amount": 8257.0,
+      "pct": 5.4,
+      "vs_last_month_pct": null
+    },
+    {
+      "category": "Health",
+      "amount": 3695.0,
+      "pct": 2.4,
+      "vs_last_month_pct": null
+    },
+    {
+      "category": "Shopping",
+      "amount": 2150.0,
+      "pct": 1.4,
+      "vs_last_month_pct": null
+    },
+    {
+      "category": "Transport",
+      "amount": 1188.0,
+      "pct": 0.8,
+      "vs_last_month_pct": null
+    },
+    {
+      "category": "Entertainment",
+      "amount": 649.0,
+      "pct": 0.4,
+      "vs_last_month_pct": null
+    }
+  ],
+  "top_merchants": [
+    {
+      "merchant": "ACH DR",
+      "amount": 68200.0
+    },
+    {
+      "merchant": "NEFT DR",
+      "amount": 25000.0
+    },
+    {
+      "merchant": "ATM WDL",
+      "amount": 17000.0
+    },
+    {
+      "merchant": "BILLPAY",
+      "amount": 4559.0
+    },
+    {
+      "merchant": "SENT TO FRIEND",
+      "amount": 4500.0
+    }
+  ],
+  "savings_score": {
+    "score": 15,
+    "label": "Critical",
+    "colour": "#ef4444",
+    "savings_rate_pct": -62.9
+  },
+  "anomalies": [
+    {
+      "type": "unusual_amount",
+      "date": "2026-05-01",
+      "description": "ACH DR-HOME EMI-SBI ******2341",
+      "amount": 31500.0,
+      "category": "EMI & Loans",
+      "message": "\u20b931,500 is >2\u00d7 EMI & Loans average (\u20b913,750)"
+    },
+    {
+      "type": "unusual_amount",
+      "date": "2026-05-04",
+      "description": "ATM WDL-HSR LAYOUT ATM-260504001",
+      "amount": 6000.0,
+      "category": "Other",
+      "message": "\u20b96,000 is >2\u00d7 Other average (\u20b92,459)"
+    },
+    {
+      "type": "unusual_amount",
+      "date": "2026-05-30",
+      "description": "ATM WDL-INDIRANAGAR ATM-260530001",
+      "amount": 7000.0,
+      "category": "Other",
+      "message": "\u20b97,000 is >2\u00d7 Other average (\u20b92,459)"
+    }
+  ],
+  "daily_spend_trend": [
+    {
+      "date": "2026-05-01",
+      "spend": 31500.0
+    },
+    {
+      "date": "2026-05-02",
+      "spend": 2580.0
+    },
+    {
+      "date": "2026-05-03",
+      "spend": 6425.0
+    },
+    {
+      "date": "2026-05-04",
+      "spend": 6000.0
+    },
+    {
+      "date": "2026-05-05",
+      "spend": 798.0
+    },
+    {
+      "date": "2026-05-06",
+      "spend": 588.0
+    },
+    {
+      "date": "2026-05-07",
+      "spend": 1988.0
+    },
+    {
+      "date": "2026-05-08",
+      "spend": 14740.0
+    },
+    {
+      "date": "2026-05-09",
+      "spend": 2950.0
+    },
+    {
+      "date": "2026-05-10",
+      "spend": 3698.0
+    },
+    {
+      "date": "2026-05-11",
+      "spend": 845.0
+    },
+    {
+      "date": "2026-05-12",
+      "spend": 1320.0
+    },
+    {
+      "date": "2026-05-13",
+      "spend": 4500.0
+    },
+    {
+      "date": "2026-05-14",
+      "spend": 25000.0
+    },
+    {
+      "date": "2026-05-15",
+      "spend": 1099.0
+    },
+    {
+      "date": "2026-05-16",
+      "spend": 2150.0
+    },
+    {
+      "date": "2026-05-17",
+      "spend": 630.0
+    },
+    {
+      "date": "2026-05-18",
+      "spend": 4000.0
+    },
+    {
+      "date": "2026-05-19",
+      "spend": 1715.0
+    },
+    {
+      "date": "2026-05-20",
+      "spend": 22500.0
+    },
+    {
+      "date": "2026-05-22",
+      "spend": 2850.0
+    },
+    {
+      "date": "2026-05-23",
+      "spend": 1290.0
+    },
+    {
+      "date": "2026-05-24",
+      "spend": 600.0
+    },
+    {
+      "date": "2026-05-25",
+      "spend": 399.0
+    },
+    {
+      "date": "2026-05-26",
+      "spend": 2500.0
+    },
+    {
+      "date": "2026-05-28",
+      "spend": 420.0
+    },
+    {
+      "date": "2026-05-29",
+      "spend": 510.0
+    },
+    {
+      "date": "2026-05-30",
+      "spend": 7000.0
+    },
+    {
+      "date": "2026-05-31",
+      "spend": 940.0
+    }
+  ],
+  "subscription_summary": {
+    "count": 3,
+    "monthly_total": 4347.0
+  },
+  "ai_insights": [
+    "Your biggest spend category is EMI & Loans at \u20b968,748 (45%)",
+    "You have 3 active subscriptions totalling \u20b94,347/month",
+    "Your savings rate is -63% \u2014 increase by \u20b981,785/month to reach 25%"
+  ],
+  "rebalancing_recommendation": "If you reduce EMI & Loans by 20%, you save an extra \u20b913,750/month"
+}

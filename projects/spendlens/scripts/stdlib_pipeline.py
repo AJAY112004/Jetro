@@ -279,8 +279,22 @@ def build_report_from_transactions(transactions: list[dict[str, Any]]) -> dict[s
         else "Track spending weekly to spot savings opportunities."
     )
 
+    hi_day = lo_day = None
+    if daily:
+        hi_key = max(daily, key=daily.get)
+        lo_key = min(daily, key=daily.get)
+        hi_day = {"date": hi_key, "spend": daily[hi_key]}
+        lo_day = {"date": lo_key, "spend": daily[lo_key]}
+
     return {
         "month_label": month_label,
+        "transaction_count": len(transactions),
+        "stats": {
+            "transaction_count": len(transactions),
+            "avg_daily_spend": round(expenses / max(1, len(daily)), 0),
+            "highest_spend_day": hi_day,
+            "lowest_spend_day": lo_day,
+        },
         "spend_summary": {
             "total_income": round(income, 2),
             "total_expenses": round(expenses, 2),

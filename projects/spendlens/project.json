@@ -5,5 +5,11 @@
   "createdAt": "2026-05-24T00:00:00.000Z",
   "linkedConnectors": [],
   "linkedTemplates": [],
-  "linkedRecipes": []
+  "linkedRecipes": [],
+  "deploy": {
+    "entrypoint": "deploy/server.py",
+    "publicUrl": "https://spendlens.jetro.app",
+    "port": 8080,
+    "healthPath": "/api/health"
+  }
 }

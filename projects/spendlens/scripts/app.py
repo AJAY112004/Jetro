@@ -24,6 +24,7 @@ SCRIPTS_DIR = Path(__file__).resolve().parent
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
+from pdf_report import PDF_BUILD_ID, build_styled_pdf  # noqa: E402
 from report_cache import json_safe, load_report, save_report  # noqa: E402
 from stdlib_pipeline import run_pipeline as stdlib_csv_pipeline  # noqa: E402
 
@@ -40,14 +41,23 @@ CORS_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5050",
     "http://localhost:5050",
+    "https://spendlens.jetro.app",
+    "http://spendlens.jetro.app",
 ]
+_extra_cors = os.environ.get("CORS_EXTRA_ORIGINS", "")
+if _extra_cors:
+    CORS_ORIGINS.extend(o.strip() for o in _extra_cors.split(",") if o.strip())
 
-logging.basicConfig(level=logging.DEBUG)
+_log_level = os.environ.get("LOG_LEVEL", "DEBUG" if os.environ.get("FLASK_DEBUG", "1") == "1" else "INFO")
+logging.basicConfig(level=getattr(logging, _log_level.upper(), logging.INFO))
 logger = logging.getLogger("spendlens")
 
-app = Flask(__name__, template_folder="templates")
+app = Flask(__name__, template_folder=str(SCRIPTS_DIR / "templates"))
 app.secret_key = os.environ.get("SPENDLENS_SECRET", "spendlens-local-dev-key")
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16 MB uploads
+if os.environ.get("SESSION_COOKIE_SECURE", "0") == "1":
+    app.config["SESSION_COOKIE_SECURE"] = True
+    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
 CORS(
     app,
@@ -55,6 +65,7 @@ CORS(
     supports_credentials=True,
     methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type", "Accept", "X-Requested-With"],
+    expose_headers=["Content-Disposition", "Content-Type", "Content-Length"],
 )
 
 
@@ -267,54 +278,41 @@ def api_download_pdf():
     report = _session_report()
     if not report:
         return _json_error("No report in session. Run /api/analyse first.", 404)
-    return _pdf_response(report)
+    try:
+        return _pdf_response(report)
+    except Exception as exc:
+        logger.exception("PDF generation failed")
+        return _json_error(f"PDF generation failed: {exc}", 500)
 
 
 def _pdf_response(report: dict):
     pdf_bytes = _build_pdf(report)
-    return send_file(
+    response = send_file(
         io.BytesIO(pdf_bytes),
         mimetype="application/pdf",
         as_attachment=True,
         download_name="spendlens_report.pdf",
     )
+    response.headers["Cache-Control"] = "no-store"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    # Lets fetch() read filename when frontend uses VITE_API_URL (cross-origin).
+    response.headers.setdefault(
+        "Access-Control-Expose-Headers",
+        "Content-Disposition, Content-Type, Content-Length",
+    )
+    return response
 
 
 def _build_pdf(report: dict) -> bytes:
-    import matplotlib
-
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-    from matplotlib.backends.backend_pdf import PdfPages
-
-    buf = io.BytesIO()
-    s = report.get("spend_summary", {})
-    sc = report.get("savings_score", {})
-
-    with PdfPages(buf) as pdf:
-        fig, ax = plt.subplots(figsize=(8.5, 11))
-        ax.axis("off")
-        lines = [
-            "SpendLens — Monthly Report",
-            report.get("month_label", ""),
-            "",
-            f"Total Income:    {_fmt_inr(s.get('total_income', 0))}",
-            f"Total Expenses:  {_fmt_inr(s.get('total_expenses', 0))}",
-            f"Net Savings:     {_fmt_inr(s.get('net_savings', 0))}",
-            "",
-            "Category breakdown:",
-        ]
-        for c in report.get("category_breakdown", [])[:10]:
-            lines.append(f"  • {c['category']}: {_fmt_inr(c['amount'])}")
-        ax.text(0.05, 0.95, "\n".join(lines), va="top", fontsize=10, family="monospace")
-        pdf.savefig(fig, bbox_inches="tight")
-        plt.close(fig)
-
-    buf.seek(0)
-    return buf.read()
+    buffer = io.BytesIO()
+    build_styled_pdf(report, buffer)
+    buffer.seek(0)
+    return buffer.getvalue()
 
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5050))
-    logger.info("SpendLens API http://127.0.0.1:%s", port)
-    app.run(host="127.0.0.1", port=port, debug=True, use_reloader=False)
+    logger.info("SpendLens API http://127.0.0.1:%s (pdf_report %s)", port, PDF_BUILD_ID)
+    debug = os.environ.get("FLASK_DEBUG", "1") == "1"
+    # Reload on code changes in dev (restart once after pulling PDF fixes).
+    app.run(host="127.0.0.1", port=port, debug=debug, use_reloader=debug)

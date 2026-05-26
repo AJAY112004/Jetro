@@ -1,0 +1,8 @@
+{
+  "slug": "spendlens",
+  "name": "SpendLens",
+  "publicUrl": "https://spendlens.jetro.app",
+  "entrypoint": "deploy/server.py",
+  "port": 8080,
+  "healthPath": "/api/health"
+}

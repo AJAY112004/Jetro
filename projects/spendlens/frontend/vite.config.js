@@ -7,14 +7,12 @@ export default defineConfig({
     host: "127.0.0.1",
     port: 5173,
     proxy: {
+      // Proxies /api/* (including /api/download-pdf) → Flask :5050 (same-origin in dev).
       "/api": {
         target: "http://127.0.0.1:5050",
         changeOrigin: true,
         secure: false,
-      },
-      "/download-pdf": {
-        target: "http://127.0.0.1:5050",
-        changeOrigin: true,
+        cookieDomainRewrite: "127.0.0.1",
       },
     },
   },

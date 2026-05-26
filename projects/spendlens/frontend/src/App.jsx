@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -11,7 +11,14 @@ import {
   Tooltip,
 } from "chart.js";
 import { Doughnut, Line } from "react-chartjs-2";
-import { analyseStatement, loadDemoReport, pdfDownloadUrl, ApiError } from "./api.js";
+import {
+  analyseStatement,
+  loadDemoReport,
+  downloadReportPdf,
+  healthCheck,
+  apiUnreachableMessage,
+  ApiError,
+} from "./api.js";
 
 ChartJS.register(
   ArcElement,
@@ -107,7 +114,25 @@ function UploadView({ onReport, onError }) {
   );
 }
 
-function ResultsView({ report, onBack }) {
+function ResultsView({ report, onBack, onError }) {
+  const [pdfLoading, setPdfLoading] = useState(false);
+
+  const handleDownloadPdf = async () => {
+    setPdfLoading(true);
+    onError?.(null);
+    try {
+      await downloadReportPdf();
+    } catch (err) {
+      const msg =
+        err instanceof ApiError
+          ? err.message
+          : err?.message || "PDF download failed — run analysis first.";
+      onError?.(msg);
+    } finally {
+      setPdfLoading(false);
+    }
+  };
+
   if (!report || typeof report !== "object") {
     return (
       <div className="app">
@@ -224,9 +249,14 @@ function ResultsView({ report, onBack }) {
       </div>
 
       <div className="actions">
-        <a className="primary" href={pdfDownloadUrl()} target="_blank" rel="noreferrer">
-          Download Report (PDF)
-        </a>
+        <button
+          type="button"
+          className="primary"
+          onClick={handleDownloadPdf}
+          disabled={pdfLoading}
+        >
+          {pdfLoading ? "Preparing PDF…" : "Download Report (PDF)"}
+        </button>
         <button type="button" className="secondary" onClick={onBack}>
           ← Upload another
         </button>
@@ -238,6 +268,19 @@ function ResultsView({ report, onBack }) {
 export default function App() {
   const [report, setReport] = useState(null);
   const [error, setError] = useState(null);
+  const [apiDown, setApiDown] = useState(false);
+
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    healthCheck()
+      .then(() => setApiDown(false))
+      .catch((err) => {
+        setApiDown(true);
+        if (err instanceof ApiError && (err.status === 502 || err.status === 0)) {
+          setError(apiUnreachableMessage(err.status || 502));
+        }
+      });
+  }, []);
 
   const handleBack = useCallback(() => {
     setReport(null);
@@ -245,11 +288,25 @@ export default function App() {
   }, []);
 
   if (report) {
-    return <ResultsView report={report} onBack={handleBack} />;
+    return (
+      <>
+        {error && (
+          <div className="error" style={{ maxWidth: 480, margin: "20px auto" }}>
+            {error}
+          </div>
+        )}
+        <ResultsView report={report} onBack={handleBack} onError={setError} />
+      </>
+    );
   }
 
   return (
     <div className="app">
+      {apiDown && !error && (
+        <div className="error" style={{ maxWidth: 520, margin: "20px auto" }}>
+          {apiUnreachableMessage(502)}
+        </div>
+      )}
       {error && <div className="error" style={{ maxWidth: 480, margin: "20px auto" }}>{error}</div>}
       <UploadView onReport={setReport} onError={setError} />
     </div>

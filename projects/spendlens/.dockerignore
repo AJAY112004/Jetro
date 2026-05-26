@@ -1,0 +1,10 @@
+__pycache__
+*.pyc
+.cache
+.git
+frontend/node_modules
+frontend/dist
+*.md
+!README.md
+.env
+.env.*
