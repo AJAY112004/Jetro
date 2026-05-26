@@ -168,11 +168,12 @@ def _parse_dates(series: pd.Series) -> pd.Series:
     return pd.to_datetime(series, errors="coerce", dayfirst=True).dt.date
 
 
-def _make_transaction_id(row: dict[str, Any], index: int) -> str:
+def _make_transaction_id(row: dict[str, Any], index: int | None = None) -> str:
     ref = row.get("transaction_id")
     if ref is not None and str(ref).strip() and str(ref).lower() != "nan":
         return str(ref).strip()
-    payload = f"{row.get('date')}|{row.get('description')}|{row.get('debit')}|{row.get('credit')}|{index}"
+    # Keep transaction identity stable across duplicated CSV rows.
+    payload = f"{row.get('date')}|{row.get('description')}|{row.get('debit')}|{row.get('credit')}"
     return hashlib.md5(payload.encode()).hexdigest()[:12]
 
 
@@ -249,8 +250,9 @@ def _body_to_standard(df: pd.DataFrame) -> pd.DataFrame:
     col_map = _map_columns(df.columns.tolist())
     bank = _detect_bank(df.columns.tolist())
 
-    # ICICI / Kotak amount split
-    if bank in ("icici", "kotak") and "amount" in col_map and "dr_cr" in col_map:
+    # DR/CR amount split (PhonePe + many exports use a single Amount column).
+    # Only apply when we don't already have explicit debit/credit columns.
+    if "amount" in col_map and "dr_cr" in col_map and "debit" not in col_map and "credit" not in col_map:
         df = _normalise_icici_axis_amount(df, col_map)
 
     records = []
@@ -294,11 +296,10 @@ def _body_to_standard(df: pd.DataFrame) -> pd.DataFrame:
     out["credit"] = out["credit"].astype(float)
     if out["balance"].notna().any():
         out["balance"] = pd.to_numeric(out["balance"], errors="coerce")
-    out["transaction_id"] = [
-        _make_transaction_id(out.iloc[i].to_dict(), i) for i in range(len(out))
-    ]
+    out["transaction_id"] = [_make_transaction_id(out.iloc[i].to_dict()) for i in range(len(out))]
     out = out.dropna(subset=["description"], how="all")
     out = out[~((out["debit"] == 0) & (out["credit"] == 0))]
+    out = out.drop_duplicates(subset=["transaction_id"], keep="first")
     return out[OUTPUT_COLUMNS].reset_index(drop=True)
 
 

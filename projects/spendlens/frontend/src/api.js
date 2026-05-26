@@ -39,15 +39,39 @@ async function readResponse(res) {
   if (!text) {
     return {
       success: false,
-      ok: false,
       error: errorForStatus(res.status, `Empty response (HTTP ${res.status})`),
     };
   }
   try {
     return JSON.parse(text);
   } catch {
-    return { success: false, ok: false, error: text.slice(0, 300) || "Invalid JSON from server" };
+    return { success: false, error: text.slice(0, 300) || "Invalid JSON from server" };
   }
+}
+
+let _jwtTokenPromise = null;
+let _jwtToken = null;
+
+async function ensureJwtToken() {
+  if (_jwtToken) return _jwtToken;
+  if (_jwtTokenPromise) return _jwtTokenPromise;
+
+  _jwtTokenPromise = (async () => {
+    const url = `${API_BASE}/auth/token`;
+    const res = await fetch(url, { headers: { Accept: "application/json" }, credentials: "include" });
+    const data = await readResponse(res);
+    if (!res.ok || data.success === false) {
+      throw new ApiError(data.error || "Auth token request failed", res.status, data.detail);
+    }
+    const token = data?.data?.token || null;
+    const enabled = data?.data?.jwtEnabled === true;
+    if (!enabled || !token) return null;
+    _jwtToken = token;
+    return token;
+  })();
+
+  _jwtToken = await _jwtTokenPromise;
+  return _jwtToken;
 }
 
 export async function healthCheck() {
@@ -57,7 +81,7 @@ export async function healthCheck() {
   if (!res.ok || data.success === false) {
     throw new ApiError(data.error || "Health check failed", res.status, data.detail);
   }
-  return data;
+  return data?.data || data;
 }
 
 export async function analyseStatement(file) {
@@ -83,6 +107,8 @@ export async function analyseStatement(file) {
     }
   }
 
+  const token = await ensureJwtToken().catch(() => null);
+
   const res = await fetch(url, {
     method: "POST",
     body: formData,
@@ -90,6 +116,7 @@ export async function analyseStatement(file) {
     headers: {
       Accept: "application/json",
       "X-Requested-With": "XMLHttpRequest",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
   });
 
@@ -99,7 +126,7 @@ export async function analyseStatement(file) {
     console.log("[api] POST /analyse →", res.status, data);
   }
 
-  const failed = !res.ok || data.success === false || data.ok === false;
+  const failed = !res.ok || data.success === false;
   if (failed) {
     throw new ApiError(
       data.error || errorForStatus(res.status, `Analysis failed (HTTP ${res.status})`),
@@ -108,11 +135,11 @@ export async function analyseStatement(file) {
     );
   }
 
-  if (!data.report) {
+  if (!data?.data?.report) {
     throw new ApiError("Server returned success but no report object", res.status);
   }
 
-  return data.report;
+  return data.data.report;
 }
 
 export async function loadDemoReport() {
@@ -125,7 +152,7 @@ export async function loadDemoReport() {
   if (!res.ok || data.success === false) {
     throw new ApiError(data.error || `Demo failed (${res.status})`, res.status, data.detail);
   }
-  return data.report;
+  return data?.data?.report;
 }
 
 function parseFilenameFromDisposition(header) {
@@ -148,12 +175,15 @@ function parseFilenameFromDisposition(header) {
  */
 export async function downloadReportPdf(filename = "spendlens_report.pdf") {
   const url = `${API_BASE}/download-pdf`;
+
+  const token = await ensureJwtToken().catch(() => null);
   const res = await fetch(url, {
     method: "GET",
     credentials: "include",
     headers: {
       Accept: "application/pdf",
       "X-Requested-With": "XMLHttpRequest",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
   });
 

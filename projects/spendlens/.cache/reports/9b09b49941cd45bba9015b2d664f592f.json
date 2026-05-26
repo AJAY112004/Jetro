@@ -1,0 +1,270 @@
+{
+  "month_label": "April 2026",
+  "transaction_count": 50,
+  "stats": {
+    "transaction_count": 50,
+    "avg_daily_spend": 6037.0,
+    "highest_spend_day": {
+      "date": "2026-04-01",
+      "spend": 28500.0
+    },
+    "lowest_spend_day": {
+      "date": "2026-04-24",
+      "spend": 95.0
+    }
+  },
+  "spend_summary": {
+    "total_income": 86049.0,
+    "total_expenses": 169028.0,
+    "net_savings": -82979.0,
+    "savings_rate_pct": -96.4
+  },
+  "category_breakdown": [
+    {
+      "category": "EMI & Loans",
+      "amount": 59500.0,
+      "pct": 35.2,
+      "vs_last_month_pct": null
+    },
+    {
+      "category": "Other",
+      "amount": 28000.0,
+      "pct": 16.6,
+      "vs_last_month_pct": null
+    },
+    {
+      "category": "Transfers",
+      "amount": 25000.0,
+      "pct": 14.8,
+      "vs_last_month_pct": null
+    },
+    {
+      "category": "Transport",
+      "amount": 14087.0,
+      "pct": 8.3,
+      "vs_last_month_pct": null
+    },
+    {
+      "category": "Shopping",
+      "amount": 12794.0,
+      "pct": 7.6,
+      "vs_last_month_pct": null
+    },
+    {
+      "category": "Groceries",
+      "amount": 8354.0,
+      "pct": 4.9,
+      "vs_last_month_pct": null
+    },
+    {
+      "category": "Utilities",
+      "amount": 6647.0,
+      "pct": 3.9,
+      "vs_last_month_pct": null
+    },
+    {
+      "category": "Food & Dining",
+      "amount": 6519.0,
+      "pct": 3.9,
+      "vs_last_month_pct": null
+    },
+    {
+      "category": "Health",
+      "amount": 4760.0,
+      "pct": 2.8,
+      "vs_last_month_pct": null
+    },
+    {
+      "category": "Entertainment",
+      "amount": 3367.0,
+      "pct": 2.0,
+      "vs_last_month_pct": null
+    }
+  ],
+  "top_merchants": [
+    {
+      "merchant": "ACH DR",
+      "amount": 59500.0
+    },
+    {
+      "merchant": "ATM WDL",
+      "amount": 23000.0
+    },
+    {
+      "merchant": "NEFT DR",
+      "amount": 22000.0
+    },
+    {
+      "merchant": "MAKEMYTRIP",
+      "amount": 8450.0
+    },
+    {
+      "merchant": "AMAZON PAY",
+      "amount": 5898.0
+    }
+  ],
+  "savings_score": {
+    "score": 15,
+    "label": "Critical",
+    "colour": "#ef4444",
+    "savings_rate_pct": -96.4
+  },
+  "anomalies": [
+    {
+      "type": "unusual_amount",
+      "date": "2026-04-03",
+      "description": "UPI-AMAZON PAY-amazon@apl-UPI/260403002",
+      "amount": 4599.0,
+      "category": "Shopping",
+      "message": "\u20b94,599 is >2\u00d7 Shopping average (\u20b92,132)"
+    },
+    {
+      "type": "unusual_amount",
+      "date": "2026-04-09",
+      "description": "BILLPAY-TATA POWER ELECTRICITY APR26",
+      "amount": 3400.0,
+      "category": "Utilities",
+      "message": "\u20b93,400 is >2\u00d7 Utilities average (\u20b91,108)"
+    },
+    {
+      "type": "unusual_amount",
+      "date": "2026-04-29",
+      "description": "POS-BARBEQUE NATION GURGAON DLF",
+      "amount": 3200.0,
+      "category": "Food & Dining",
+      "message": "\u20b93,200 is >2\u00d7 Food & Dining average (\u20b9931)"
+    },
+    {
+      "type": "unusual_amount",
+      "date": "2026-04-26",
+      "description": "UPI-MAKEMYTRIP-mmt@hdfcbank-UPI/260426002",
+      "amount": 8450.0,
+      "category": "Transport",
+      "message": "\u20b98,450 is >2\u00d7 Transport average (\u20b92,012)"
+    }
+  ],
+  "daily_spend_trend": [
+    {
+      "date": "2026-04-01",
+      "spend": 28500.0
+    },
+    {
+      "date": "2026-04-02",
+      "spend": 1130.0
+    },
+    {
+      "date": "2026-04-03",
+      "spend": 6939.0
+    },
+    {
+      "date": "2026-04-04",
+      "spend": 10000.0
+    },
+    {
+      "date": "2026-04-05",
+      "spend": 1317.0
+    },
+    {
+      "date": "2026-04-06",
+      "spend": 697.0
+    },
+    {
+      "date": "2026-04-07",
+      "spend": 3721.0
+    },
+    {
+      "date": "2026-04-08",
+      "spend": 13390.0
+    },
+    {
+      "date": "2026-04-09",
+      "spend": 3400.0
+    },
+    {
+      "date": "2026-04-10",
+      "spend": 4018.0
+    },
+    {
+      "date": "2026-04-11",
+      "spend": 1238.0
+    },
+    {
+      "date": "2026-04-12",
+      "spend": 6100.0
+    },
+    {
+      "date": "2026-04-13",
+      "spend": 2820.0
+    },
+    {
+      "date": "2026-04-14",
+      "spend": 24499.0
+    },
+    {
+      "date": "2026-04-15",
+      "spend": 999.0
+    },
+    {
+      "date": "2026-04-16",
+      "spend": 1299.0
+    },
+    {
+      "date": "2026-04-17",
+      "spend": 5540.0
+    },
+    {
+      "date": "2026-04-18",
+      "spend": 500.0
+    },
+    {
+      "date": "2026-04-19",
+      "spend": 1450.0
+    },
+    {
+      "date": "2026-04-20",
+      "spend": 18899.0
+    },
+    {
+      "date": "2026-04-22",
+      "spend": 4200.0
+    },
+    {
+      "date": "2026-04-23",
+      "spend": 2298.0
+    },
+    {
+      "date": "2026-04-24",
+      "spend": 95.0
+    },
+    {
+      "date": "2026-04-25",
+      "spend": 299.0
+    },
+    {
+      "date": "2026-04-26",
+      "spend": 11450.0
+    },
+    {
+      "date": "2026-04-28",
+      "spend": 1230.0
+    },
+    {
+      "date": "2026-04-29",
+      "spend": 3880.0
+    },
+    {
+      "date": "2026-04-30",
+      "spend": 9120.0
+    }
+  ],
+  "subscription_summary": {
+    "count": 6,
+    "monthly_total": 4284.0
+  },
+  "ai_insights": [
+    "Your biggest spend category is EMI & Loans at \u20b959,500 (35%)",
+    "You have 6 active subscriptions totalling \u20b94,284/month",
+    "Your savings rate is -96% \u2014 increase by \u20b9104,491/month to reach 25%"
+  ],
+  "rebalancing_recommendation": "If you reduce EMI & Loans by 20%, you save an extra \u20b911,900/month"
+}

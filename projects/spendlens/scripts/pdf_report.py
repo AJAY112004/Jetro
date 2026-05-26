@@ -507,12 +507,12 @@ def build_styled_pdf(report: dict, buffer: BinaryIO) -> None:
     insights = report.get("ai_insights") or []
 
     alert_body = (
-        [Paragraph(f"⚠ {_clean_text(a.get('message', ''))}", _style("alert")) for a in anomalies[:4]]
+        [Paragraph(f"! {_clean_text(a.get('message', ''))}", _style("alert")) for a in anomalies[:4]]
         if anomalies
         else [Paragraph("No anomalies flagged this period.", _style("body"))]
     )
     insight_body = (
-        [Paragraph(f"• {_clean_text(t)}", _style("insight")) for t in insights[:4]]
+        [Paragraph(f"- {_clean_text(t)}", _style("insight")) for t in insights[:4]]
         if insights
         else [Paragraph("No additional insights.", _style("body"))]
     )
@@ -543,8 +543,8 @@ def build_styled_pdf(report: dict, buffer: BinaryIO) -> None:
     insights_row = Table(
         [
             [
-                _insight_card("Anomaly Alerts", "⚠", alert_body, C_ALERT_BG, C_EXPENSE),
-                _insight_card("AI Insights", "💡", insight_body, C_INSIGHT_BG, C_PRIMARY),
+                _insight_card("Anomaly Alerts", "!", alert_body, C_ALERT_BG, C_EXPENSE),
+                _insight_card("AI Insights", "i", insight_body, C_INSIGHT_BG, C_PRIMARY),
             ]
         ],
         colWidths=[half_w, half_w],
@@ -555,7 +555,7 @@ def build_styled_pdf(report: dict, buffer: BinaryIO) -> None:
     # --- Rebalancing ---
     rebal = report.get("rebalancing_recommendation") or ""
     rebal_tbl = Table(
-        [[Paragraph(f"⚙ <b>REBALANCING SUGGESTION</b> — {_clean_text(rebal)}", _style("insight"))]],
+        [[Paragraph(f"<b>RECOMMENDATIONS</b> — {_clean_text(rebal)}", _style("insight"))]],
         colWidths=[usable_w],
     )
     rebal_tbl.setStyle(

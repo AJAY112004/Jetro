@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  spendlens:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SPENDLENS_SECRET=change-me-in-prod
+      - JWT_SECRET=change-me-in-prod-and-make-it-long-enough-32+
+      - AUTH_ENABLED=1
+      - SESSION_COOKIE_SECURE=0
+      - CORS_ALLOWED_ORIGINS=
+

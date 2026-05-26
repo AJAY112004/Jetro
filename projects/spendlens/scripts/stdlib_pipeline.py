@@ -1,6 +1,10 @@
 """
-CSV analysis pipeline using only the Python standard library (no pandas).
-Avoids process crashes and handles HDFC + generic bank CSV layouts.
+SpendLens standard-library pipeline.
+
+Design goals:
+- No pandas dependency at runtime.
+- Handles CSV statements robustly.
+- Best-effort PDF table extraction via `pdfplumber` (no pandas).
 """
 
 from __future__ import annotations
@@ -68,7 +72,10 @@ def _pick_column(headers: list[str], aliases: list[str]) -> str | None:
     normed = {_norm_header(h): h for h in headers}
     for alias in aliases:
         for nk, orig in normed.items():
-            if alias == nk or alias in nk:
+            # Avoid false positives for short tokens like "cr"/"dr" matching words like "description".
+            if alias == nk:
+                return orig
+            if len(alias) >= 4 and alias in nk:
                 return orig
     return None
 
@@ -152,7 +159,123 @@ def parse_csv_file(path: Path) -> list[dict[str, Any]]:
     if not transactions:
         raise ValueError("No transactions found in CSV. Check column headers and data rows.")
 
-    return transactions
+    # Deduplicate identical rows (some exports repeat headers/rows mid-file).
+    seen: set[str] = set()
+    unique: list[dict[str, Any]] = []
+    for t in transactions:
+        key = (
+            f"{t.get('date')}|{t.get('description')}|"
+            f"{round(float(t.get('debit') or 0), 2)}|{round(float(t.get('credit') or 0), 2)}"
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(t)
+
+    return unique
+
+
+def parse_pdf_file(path: Path) -> list[dict[str, Any]]:
+    """
+    Best-effort PDF parsing via pdfplumber table extraction.
+
+    Note: This is intentionally kept pandas-free to avoid native-library crashes.
+    """
+    try:
+        import pdfplumber
+    except ImportError as exc:
+        raise ImportError("pdfplumber is required for PDF parsing.") from exc
+
+    all_tables: list[list[list[Any]]] = []
+    with pdfplumber.open(path) as pdf:
+        for page in pdf.pages:
+            tables = page.extract_tables(
+                table_settings={
+                    "vertical_strategy": "lines",
+                    "horizontal_strategy": "lines",
+                    "snap_tolerance": 4,
+                    "join_tolerance": 4,
+                }
+            )
+            if tables:
+                all_tables.extend(tables)
+
+    transactions: list[dict[str, Any]] = []
+
+    for table in all_tables:
+        if not table or len(table) < 2:
+            continue
+        header = [str(c or "").strip() for c in table[0]]
+        rows = table[1:]
+
+        col_date = _pick_column(header, ["date", "txn date", "transaction date", "value dt", "value date"])
+        col_desc = _pick_column(
+            header,
+            ["narration", "description", "particulars", "remarks", "transaction remarks"],
+        )
+        col_debit = _pick_column(
+            header,
+            ["withdrawal amt.", "withdrawal", "debit", "debit amount", "dr", "withdrawal amount"],
+        )
+        col_credit = _pick_column(
+            header,
+            ["deposit amt.", "deposit", "credit", "credit amount", "cr", "deposit amount"],
+        )
+        col_amount = _pick_column(header, ["amount", "amount(inr)", "transaction amount"])
+        col_type = _pick_column(header, ["transaction type", "dr/cr", "type"])
+
+        for r in rows:
+            row = list(r) + [None] * max(0, len(header) - len(r))
+
+            desc = (row[header.index(col_desc)] if col_desc and col_desc in header else "") or ""
+            desc = str(desc).strip()
+            if not desc:
+                continue
+            if re.match(r"^(opening|closing) balance", desc, re.I):
+                continue
+
+            debit = credit = 0.0
+            if col_debit or col_credit:
+                if col_debit and col_debit in header:
+                    debit = _parse_float(row[header.index(col_debit)])
+                if col_credit and col_credit in header:
+                    credit = _parse_float(row[header.index(col_credit)])
+            elif col_amount and col_type:
+                idx_amt = header.index(col_amount)
+                idx_type = header.index(col_type)
+                amt = _parse_float(row[idx_amt])
+                typ = (str(row[idx_type]) if row[idx_type] is not None else "").strip().upper()
+                if typ in ("DR", "DEBIT", "D", "WITHDRAWAL"):
+                    debit = amt
+                elif typ in ("CR", "CREDIT", "C", "DEPOSIT"):
+                    credit = amt
+                elif amt < 0:
+                    debit = abs(amt)
+                else:
+                    debit = amt
+
+            if debit == 0 and credit == 0:
+                continue
+
+            dt = _parse_date(row[header.index(col_date)]) if col_date and col_date in header else None
+            transactions.append({"date": dt, "description": desc, "debit": debit, "credit": credit})
+
+    if not transactions:
+        raise ValueError("No transactions found in PDF. Check table extraction quality.")
+
+    # Deduplicate identical rows.
+    seen: set[str] = set()
+    unique: list[dict[str, Any]] = []
+    for t in transactions:
+        key = (
+            f"{t.get('date')}|{t.get('description')}|{round(float(t.get('debit') or 0),2)}|{round(float(t.get('credit') or 0),2)}"
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(t)
+
+    return unique
 
 
 def categorise_desc(desc: str) -> str:
@@ -322,7 +445,10 @@ def build_report_from_transactions(transactions: list[dict[str, Any]]) -> dict[s
 
 def run_pipeline(path: str | Path) -> dict[str, Any]:
     path = Path(path)
-    if path.suffix.lower() != ".csv":
-        raise ValueError("stdlib pipeline only supports CSV files")
-    txs = parse_csv_file(path)
-    return build_report_from_transactions(txs)
+    if path.suffix.lower() == ".csv":
+        txs = parse_csv_file(path)
+        return build_report_from_transactions(txs)
+    if path.suffix.lower() == ".pdf":
+        txs = parse_pdf_file(path)
+        return build_report_from_transactions(txs)
+    raise ValueError("Unsupported file type for stdlib pipeline (use .csv or .pdf)")

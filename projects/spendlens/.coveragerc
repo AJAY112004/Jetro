@@ -1,0 +1,10 @@
+[run]
+branch = True
+omit =
+    scripts/analytics.py
+    scripts/categorise.py
+    scripts/export_report.py
+    scripts/parse_statement.py
+    scripts/seed_report.py
+    scripts/app.py
+

@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: spendlens-backend
+    env: python
+    plan: free
+    buildCommand: pip install -r scripts/requirements.txt
+    startCommand: python scripts/app.py
+    healthCheckPath: /api/health
+    envVars:
+      - key: SPENDLENS_SECRET
+        value: change-me-in-prod
+      - key: JWT_SECRET
+        value: change-me-in-prod-and-make-it-long-enough-32+
+      - key: AUTH_ENABLED
+        value: "1"
+      - key: SESSION_COOKIE_SECURE
+        value: "1"
+      - key: CORS_ALLOWED_ORIGINS
+        value: ""
+

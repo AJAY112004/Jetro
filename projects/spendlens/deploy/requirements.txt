@@ -5,3 +5,7 @@ flask-cors>=4.0.0
 reportlab>=4.0.0
 gunicorn>=22.0.0
 waitress>=3.0.0
+flask-limiter
+flask-talisman
+PyJWT
+pymongo
