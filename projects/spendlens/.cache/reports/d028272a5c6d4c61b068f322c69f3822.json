@@ -1,0 +1,131 @@
+{
+  "month_label": "This month",
+  "transaction_count": 519,
+  "stats": {
+    "transaction_count": 519,
+    "avg_daily_spend": 36263.0,
+    "highest_spend_day": null,
+    "lowest_spend_day": null
+  },
+  "spend_summary": {
+    "total_income": 43963.88,
+    "total_expenses": 36262.93,
+    "net_savings": 7700.95,
+    "savings_rate_pct": 17.5
+  },
+  "category_breakdown": [
+    {
+      "category": "Other",
+      "amount": 35257.93,
+      "pct": 97.2,
+      "vs_last_month_pct": null
+    },
+    {
+      "category": "Utilities",
+      "amount": 763.0,
+      "pct": 2.1,
+      "vs_last_month_pct": null
+    },
+    {
+      "category": "Food & Dining",
+      "amount": 172.0,
+      "pct": 0.5,
+      "vs_last_month_pct": null
+    },
+    {
+      "category": "Transport",
+      "amount": 70.0,
+      "pct": 0.2,
+      "vs_last_month_pct": null
+    }
+  ],
+  "top_merchants": [
+    {
+      "merchant": "Paid to SBI ATM CASH WITHDRAWAL THRO",
+      "amount": 18800.0
+    },
+    {
+      "merchant": "Paid to Greenhorn Wellness Private L",
+      "amount": 3855.9
+    },
+    {
+      "merchant": "Paid to Srinidhi Ksit",
+      "amount": 2500.0
+    },
+    {
+      "merchant": "Paid to NAGARATHNA",
+      "amount": 2000.0
+    },
+    {
+      "merchant": "Paid to K S Institute Of Technology",
+      "amount": 1200.0
+    }
+  ],
+  "savings_score": {
+    "score": 58,
+    "label": "Fair",
+    "colour": "#eab308",
+    "savings_rate_pct": 17.5
+  },
+  "anomalies": [
+    {
+      "type": "unusual_amount",
+      "date": "",
+      "description": "Paid to K S Institute Of Technology",
+      "amount": 1200.0,
+      "category": "Other",
+      "message": "\u20b91,200 is >2\u00d7 Other average (\u20b9312)"
+    },
+    {
+      "type": "unusual_amount",
+      "date": "",
+      "description": "Paid to NAGARATHNA",
+      "amount": 2000.0,
+      "category": "Other",
+      "message": "\u20b92,000 is >2\u00d7 Other average (\u20b9312)"
+    },
+    {
+      "type": "unusual_amount",
+      "date": "",
+      "description": "Paid to SBI ATM CASH WITHDRAWAL THROUGH UPI",
+      "amount": 7000.0,
+      "category": "Other",
+      "message": "\u20b97,000 is >2\u00d7 Other average (\u20b9312)"
+    },
+    {
+      "type": "unusual_amount",
+      "date": "",
+      "description": "Paid to Srinidhi Ksit",
+      "amount": 2500.0,
+      "category": "Other",
+      "message": "\u20b92,500 is >2\u00d7 Other average (\u20b9312)"
+    },
+    {
+      "type": "unusual_amount",
+      "date": "",
+      "description": "Paid to SBI ATM CASH WITHDRAWAL THROUGH UPI",
+      "amount": 4300.0,
+      "category": "Other",
+      "message": "\u20b94,300 is >2\u00d7 Other average (\u20b9312)"
+    },
+    {
+      "type": "unusual_amount",
+      "date": "",
+      "description": "Paid to SBI ATM CASH WITHDRAWAL THROUGH UPI",
+      "amount": 7500.0,
+      "category": "Other",
+      "message": "\u20b97,500 is >2\u00d7 Other average (\u20b9312)"
+    }
+  ],
+  "daily_spend_trend": [],
+  "subscription_summary": {
+    "count": 4,
+    "monthly_total": 1426.0
+  },
+  "ai_insights": [
+    "Your biggest spend category is Other at \u20b935,258 (97%)",
+    "You have 4 active subscriptions totalling \u20b91,426/month",
+    "Your savings rate is 18% \u2014 increase by \u20b93,290/month to reach 25%"
+  ],
+  "rebalancing_recommendation": "If you reduce Other by 20%, you save an extra \u20b97,052/month"
+}
